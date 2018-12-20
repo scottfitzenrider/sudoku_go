@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-const printOnSetSolved bool = true
+const printOnSetSolved bool = false
 
 type suduku struct {
 	board [10][10]int
@@ -28,6 +28,12 @@ func setSolved(s *suduku, r int, c int, v int, doprint bool) {
 	if v == 0 {
 		return
 	}
+	if doprint {
+		fmt.Printf("Setting (%d,%d) to %d\n", r, c, v)
+		printBoard(s)
+		showLevel(s, v)
+	}
+
 	s.board[r][c] = v
 	for i := 1; i < 10; i++ {
 		s.data[r][c][i] = 0
@@ -42,8 +48,9 @@ func setSolved(s *suduku, r int, c int, v int, doprint bool) {
 		}
 	}
 	if doprint {
-		fmt.Printf("Setting (%d,%d) to %d\n", r, c, v)
+		fmt.Printf("Done Setting (%d,%d) to %d\n", r, c, v)
 		printBoard(s)
+		showLevel(s, v)
 	}
 }
 func solveBoard(s *suduku) bool {
@@ -99,7 +106,7 @@ func solveBoard(s *suduku) bool {
 					for r := 0; r < 3; r++ {
 						for c := 0; c < 3; c++ {
 							if s.data[br+r][bc+c][v] != 0 {
-								bfound = append(bfound, []int{r, c})
+								bfound = append(bfound, []int{br + r, bc + c})
 							}
 						}
 					}
@@ -122,7 +129,7 @@ func solveBoard(s *suduku) bool {
 									}
 								}
 							}
-							if bfound[0][0] == bfound[0][1] {
+							if bfound[0][1] == bfound[1][1] {
 								c := bfound[0][1]
 								r0 := bfound[0][0]
 								r1 := bfound[1][0]
@@ -184,7 +191,9 @@ func readSuduku(filename string) (suduku, error) {
 			if err != nil {
 				return s, err
 			}
-			setSolved(&s, r+1, c+1, v, false)
+			if v != 0 {
+				setSolved(&s, r+1, c+1, v, false)
+			}
 		}
 	}
 	printBoard(&s)
@@ -199,6 +208,14 @@ func printBoard(s *suduku) {
 	}
 	fmt.Println()
 }
+func showLevel(s *suduku, v int) {
+	for r := 1; r < 10; r++ {
+		for c := 1; c < 10; c++ {
+			fmt.Printf("%d ", s.data[r][c][v])
+		}
+		fmt.Println()
+	}
+}
 func main() {
 	s, err := readSuduku("hard.txt")
 	if err != nil {
@@ -208,11 +225,6 @@ func main() {
 	fmt.Println()
 	solveBoard(&s)
 	solveBoard(&s)
+	printBoard(&s)
 	fmt.Println()
-	for r := 1; r < 10; r++ {
-		for c := 1; c < 10; c++ {
-			fmt.Printf("%d ", s.data[r][c][5])
-		}
-		fmt.Println()
-	}
 }
