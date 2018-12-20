@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"io/ioutil"
+	"os"
 	"strconv"
 	"strings"
 )
@@ -269,15 +270,30 @@ func showLevel(s *suduku, v int) {
 		fmt.Println()
 	}
 }
+func usage() {
+	fmt.Printf("usage: %s <filename>\n", os.Args[0])
+	fmt.Println("where <filename> is the name of a file defining sudoku board")
+}
 func main() {
-	s, err := readSuduku("expert.txt")
-	if err != nil {
-		fmt.Println(err)
+	if len(os.Args) != 2 {
+		usage()
 		return
 	}
-	fmt.Println()
+	filename := os.Args[1]
+	s, err := readSuduku(filename)
+	if err != nil {
+		fmt.Println(err)
+		usage()
+		return
+	}
 	s, solved := solveBoard(&s)
-	fmt.Println(solved)
-	printBoard(&s)
+	if !solved {
+		fmt.Println()
+		fmt.Printf("Could not Solve %s not a legitimate sudoku board\n", filename)
+	} else {
+		fmt.Println("Solution:")
+	}
 	fmt.Println()
+	printBoard(&s)
+
 }
