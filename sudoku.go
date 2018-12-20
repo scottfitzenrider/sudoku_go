@@ -238,15 +238,22 @@ func readSuduku(filename string) (suduku, error) {
 	if err != nil {
 		return s, err
 	}
-	datstr := strings.Split(string(dat), "\r\n")
-	for r := range datstr {
-		for c := range datstr[r] {
-			v, err := strconv.Atoi(string(datstr[r][c]))
-			if err != nil {
-				return s, err
-			}
-			if v != 0 {
-				setSolved(&s, r+1, c+1, v, false)
+	datstr := strings.Split(string(dat), "")
+	i := 0
+	for r := 0; r < 9; r++ {
+		for c := 0; c < 9; c++ {
+			for {
+				if i >= len(datstr) {
+					return s, fmt.Errorf("Could not read %s", filename)
+				}
+				v, err := strconv.Atoi(string(datstr[i]))
+				i++
+				if err == nil {
+					if v != 0 {
+						setSolved(&s, r+1, c+1, v, false)
+					}
+					break
+				}
 			}
 		}
 	}
